@@ -3,6 +3,7 @@
 icon: fas fa-info-circle
 order: 4
 ---
+
 <hr>
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -18,4 +19,12 @@ order: 4
       <img src="https://tryhackme-badges.s3.amazonaws.com/whare1.png" alt="THM Badge" />
     </a>
   </div>
-</div> 
+</div>
+
+
+Hi, I'm **whare1**, a passionate cybersecurity enthusiast from **Valencia, Spain**. I specialize in ethical hacking and penetration testing, exploring various aspects of cybersecurity, from **network exploitation** to **vulnerability assessments** and **writeups**.
+
+I take pride in breaking down complex concepts and sharing my findings through detailed blog posts and tutorials. My goal is to continuously learn, improve, and contribute to the cybersecurity community.
+
+Feel free to explore my **blog** to see some of my work and contributions!
+![netrunner](/assets/images/netrunner.gif)
