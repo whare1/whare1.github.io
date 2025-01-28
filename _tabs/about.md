@@ -18,9 +18,4 @@ order: 4
       <img src="https://tryhackme-badges.s3.amazonaws.com/whare1.png" alt="THM Badge" />
     </a>
   </div>
-</div>
-<<<<<<< HEAD
-
-
-=======
->>>>>>> d0e6d553bdd0ec03af43666aa886263e35c8afa9
+</div> 

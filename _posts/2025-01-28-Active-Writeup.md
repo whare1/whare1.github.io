@@ -2,12 +2,8 @@
 layaout: post
 title: Active Write Up HTB
 date: 28-01-2025
-header:
-  teaser: /assets/images/active.png
-  teaser_home_page: true
-  icon: /assets/images/active.png
 categories: [Write ups]
-tag: [active directory, kerberoasting, GPP]
+tag: [Active Directory, kerberoasting, GPP]
 ---
 ![img-description](/assets/images/active.png)
 
