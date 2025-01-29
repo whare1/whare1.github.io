@@ -152,3 +152,4 @@ smb: \Users\Administrator\Desktop\> ls
   root.txt                           AR       34  Mon Jan 27 18:59:52 2025
   
 ````
+![netrunner](/assets/images/netrunner.gif)

@@ -1,6 +1,6 @@
 ---
 layaout: post
-title: Write Up Saune
+title: Sauna Write Up HTB
 date: 28-01-2025
 categories: [Write ups]
 tag: [Active Directory, Osint, Bloodhound, As-Rep]
@@ -65,7 +65,7 @@ Host script results:
 
 After analyzing the Nmap scan, we can deduce that we are dealing with an Active Directory environment. The presence of a web server on port 80 raises suspicion, as it is quite uncommon and generally inadvisable to have a publicly accessible web service within a corporate environment. However, before enumerating the web server, we will proceed to test the SMB service.
 
-## Enumeration SMB as anonymous and guest.
+## Enumerating SMB as anonymous and guest.
 ---
 ````bash
 ❯ crackmapexec smb 10.10.10.175 -u '' -p ''
@@ -78,7 +78,7 @@ SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\g
 
 Unfortunately, we do not have any access to the SMB service as either an anonymous or guest user. Therefore, we proceed to enumerate the web server in search of information that might help us identify a potential attack vector.
 
-## Enumeration of the web service at port 80
+## Enumerating of the web service at port 80
 ---
 While enumerating the web server, we discovered potential employee names from the company. However, we are unsure of the naming convention used within the Active Directory. As a result, we have created our own custom wordlist and will test it to determine if any of the entries correspond to valid usernames.
 ![Usersweb](/assets/saune/usernames.png)
@@ -352,3 +352,4 @@ Mode                LastWriteTime         Length Name
 ----                -------------         ------ ----
 -ar---        1/28/2025   2:54 PM             34 root.txt
 ````
+![netrunner](/assets/images/netrunner.gif)
