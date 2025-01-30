@@ -5,6 +5,7 @@ title: Resolute Write Up HTB
 date: 29-01-2025
 categories: [Write ups]
 tag: [Active Directory, Missconfigs, DnsAdmins, Password-Spraying]
+excerpt: "Testiadno"
 ---
 ![img-description](assets/images/resolute.png)
 
