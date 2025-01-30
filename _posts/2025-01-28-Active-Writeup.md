@@ -1,6 +1,6 @@
 ---
 layaout: post
-image: assets/images/active_test1.png
+image: /assets/images/active_test1.png
 title: Active Write Up HTB
 date: 28-01-2025
 categories: [Write ups]

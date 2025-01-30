@@ -2,7 +2,7 @@
 layaout: post
 image: assets/images/resolute.png
 title: Resolute Write Up HTB
-date: 28-01-2025
+date: 29-01-2025
 categories: [Write ups]
 tag: [Active Directory, Missconfigs, DnsAdmins, Password-Spraying]
 ---
