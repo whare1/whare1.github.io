@@ -1,7 +1,7 @@
 ---
 layaout: post
 title: Sauna Write Up HTB
-image: assets/saune/sauna.png
+image: assets/saune/Sauna.png
 date: 28-01-2025
 categories: [Write ups]
 tag: [Active Directory, Osint, Bloodhound, As-Rep]
