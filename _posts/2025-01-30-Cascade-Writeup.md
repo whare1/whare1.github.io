@@ -408,7 +408,7 @@ To be honest, this part of the machine seemed like Brainfuck to me and I had to 
 
 ![Usersweb](/assets/cascade/dnspy1.png)
 
-![Usersweb](/assets/cascade/dnspy2.png)
+![Usersweb](/assets/cascade/dnsp2.png)
 
 By examining the code, we can see that it encrypts the password (stored in the database we also downloaded) using AES in CBC mode with the key "c4scadek3y654321.""1tdyjCbY1Ix49842" We'll use CyberChef to input the key and try to decrypt the credentials.
 
