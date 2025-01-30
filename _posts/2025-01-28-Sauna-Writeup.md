@@ -1,11 +1,12 @@
 ---
 layaout: post
 title: Sauna Write Up HTB
+image: assets/saune/sauna.png
 date: 28-01-2025
 categories: [Write ups]
 tag: [Active Directory, Osint, Bloodhound, As-Rep]
 ---
-![img-description](/assets/saune/Sauna.png)
+![img-description](assets/saune/Sauna.png)
 
 **Sauna** is an easy-level machine that challenges you to perform internal network penetration testing within an Active Directory environment. It involves techniques such as website OSINT for gathering potential usernames, BloodHound enumeration for mapping attack paths, and executing DCSync attacks to extract password hashes.
 

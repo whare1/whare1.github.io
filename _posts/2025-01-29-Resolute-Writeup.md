@@ -1,15 +1,16 @@
 ---
 layaout: post
+image: assets/images/resolute.png
 title: Resolute Write Up HTB
 date: 28-01-2025
 categories: [Write ups]
 tag: [Active Directory, Missconfigs, DnsAdmins, Password-Spraying]
 ---
-![img-description](/assets/images/resolute.png)
+![img-description](assets/images/resolute.png)
 
 **Resolute** is a medium-difficulty machine on Hack The Box that focuses on enumeration, privilege escalation, and exploiting misconfigurations in services and group memberships. The machine provides a hands-on opportunity to practice techniques related to Active Directory, DNS misconfigurations, and privilege escalation, ultimately leading to system-level access.
 
-# ENNUMERATION
+# ENUMERATION
 ---
 ## Nmap scanning
 

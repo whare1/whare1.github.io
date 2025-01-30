@@ -1,11 +1,12 @@
 ---
 layaout: post
+image: assets/images/active_test1.png
 title: Active Write Up HTB
 date: 28-01-2025
 categories: [Write ups]
 tag: [Active Directory, kerberoasting, GPP]
 ---
-![img-description](/assets/images/active.png)
+![img-description](/assets/images/active_test1.png)
 
 **Active** is a relatively straightforward machine, perfect for getting started with **Active Directory**. In this machine, we'll explore techniques like **Kerberoasting** and **GPP Passwords**, two common methods for privilege escalation in AD environments. Great for practicing and understanding key concepts! 🚀
 # **ENUMERATION**
