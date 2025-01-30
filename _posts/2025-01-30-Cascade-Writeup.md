@@ -162,7 +162,8 @@ Now that we know the namingContexts: `DC=cascade,DC=local`, we can safely enumer
 ````bash
 ❯ ldapsearch -x -H ldap://10.10.10.182 -b 'DC=cascade,DC=local' -s sub > ldap_dump.txt
 ````
-The problem with this command is that it dumps all the information, making it difficult to focus on what's important. Therefore, we can be more specific about what we want to dump. In this case, using the filter `(objectClass=person)`, we found relevant information. However, here is a link to a cheatsheet where you can find more filters (adjuntar link)
+The problem with this command is that it dumps all the information, making it difficult to focus on what's important. Therefore, we can be more specific about what we want to dump. In this case, using the filter `(objectClass=person)`, we found relevant information. However, here is a link to a <a href="https://gist.github.com/jonlabelle/0f8ec20c2474084325a89bc5362008a7" target="_blank">cheatsheet</a> where you can find more filters.
+
 
 ````bash
 ❯ ldapsearch -H ldap://10.10.10.182 -x -b "DC=cascade,DC=local" "(objectClass=person)" > dumping_users.txt
