@@ -5,6 +5,7 @@ title: Cascade Write Up HTB
 date: 30-01-2025
 categories: [Write ups]
 tag: [Active Directory, DnSpy]
+excerpt: "Cascade is a medium difficulty Windows machine acting as a Domain Controller. Through enumeration and exploiting certain Active Directory features, we discover a series of credentials leading to escalating privileges. The key to success lies in leveraging the AD Recycle Bin to retrieve valuable information and ultimately gain access to the domain administrator account"
 ---
 
 ![img-description](/assets/images/cascade.png)
