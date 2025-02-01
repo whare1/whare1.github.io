@@ -11,11 +11,11 @@ excerpt: "Resolute is a medium-difficulty machine on Hack The Box that focuses o
 
 **Resolute** is a medium-difficulty machine on Hack The Box that focuses on enumeration, privilege escalation, and exploiting misconfigurations in services and group memberships. The machine provides a hands-on opportunity to practice techniques related to Active Directory, DNS misconfigurations, and privilege escalation, ultimately leading to system-level access.
 
-# ENUMERATION
+## ENUMERATION
 ---
-## Nmap scanning
+### Nmap scanning
+---
 
----
 ````bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn 10.10.10.169 -sCV -vvv
 
@@ -86,7 +86,7 @@ Host script results:
 
 By looking at the Nmap scan, we can notice that we are dealing with an Active Directory, so let's get to work
 
-## Enumerating SMB as anonymous and guest
+### Enumerating SMB as anonymous and guest
 ---
 We start by enumerating SMB to see if we can find anything interesting, but unfortunately, we are unable to access it
 
@@ -100,7 +100,7 @@ crackmapexec smb 10.10.10.169 -u '' -p ''
 SMB         10.10.10.169    445    RESOLUTE         [*] Windows Server 2016 Standard 14393 x64 (name:RESOLUTE) (domain:megabank.local) (signing:True) (SMBv1:True)
 SMB         10.10.10.169    445    RESOLUTE         [+] megabank.local\: 
 ````
-## Enumerating RPC 
+### Enumerating RPC 
 ---
 
 Since we didn't find anything useful in the SMB service, we’ll move on to testing a less commonly seen open port: **135**. This port is associated with **RPC (Remote Procedure Call)**, a protocol used by Windows systems to enable communication between different processes, often across a network. RPC is crucial for many administrative functions, such as managing users, groups, and network shares, especially in environments like Active Directory.
@@ -177,7 +177,7 @@ Trying to log in into marko's account.
 SMB         10.10.10.169    445    RESOLUTE         [*] Windows Server 2016 Standard 14393 x64 (name:RESOLUTE) (domain:megabank.local) (signing:True) (SMBv1:True)
 SMB         10.10.10.169    445    RESOLUTE         [-] megabank.local\marko:Welcome123! STATUS_LOGON_FAILURE 
 ````
-## Password Spraying
+### Password Spraying
 
 ---
 
@@ -227,7 +227,7 @@ Next, using the following command with the **crackmapexec** tool, we initiate ou
 SMB         10.10.10.169    445    RESOLUTE         [+] megabank.local\melanie:Welcome123! 
 ````
 
-# FOOTHOLD
+## FOOTHOLD
 ---
 During our previous enumeration with Nmap, we noticed that the WinRM port was open:
 
@@ -256,7 +256,7 @@ Mode                LastWriteTime         Length Name
 
 ````
 
-## AUTHENTICATED ENUMERATION
+### AUTHENTICATED ENUMERATION
 
 After running winPEAS we didnt find anything special
 
@@ -290,7 +290,7 @@ Mode                LastWriteTime         Length Name
 cmd /c net use X: \\fs01\backups ryan Serv3r4Admin4cc123!
 ````
 
-# PRIVILEGE ESCALATION
+## PRIVILEGE ESCALATION
 ---
 We log in with the new user and we found a note.
 
@@ -327,7 +327,7 @@ NT AUTHORITY\NTLM Authentication           Well-known group S-1-5-64-10         
 Mandatory Label\Medium Mandatory Level     Label            S-1-16-8192
 ````
 
-## Abusing DnsAdmins group
+### Abusing DnsAdmins group
 ---
 
 We create our malicious plugin using msfvenom
@@ -403,7 +403,8 @@ SERVICE_NAME: dns
         PID                : 2664
         FLAGS              :
 ````
-
+## LOGIN AS ADMINISTRATOR
+---
 If everything has been done correctly, we will receive a shell as **NT AUTHORITY\System**
 
 ````powershell

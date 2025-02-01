@@ -13,11 +13,11 @@ excerpt: "Cascade is a medium difficulty Windows machine acting as a Domain Cont
 **Cascade** is a medium difficulty Windows machine acting as a Domain Controller. Through enumeration and exploiting certain Active Directory features, we discover a series of credentials leading to escalating privileges. The key to success lies in leveraging the **AD Recycle Bin** to retrieve valuable information and ultimately gain access to the domain administrator account.
 
 
-# ENUMERATION
+## ENUMERATION
 
 ---
 
-## Nmap scanning
+### Nmap scanning
 
 ---
 
@@ -69,7 +69,7 @@ Host script results:
 
 The Nmap scan provided several interesting insights, such as the fact that the server is running **Windows Server 2008**, which is significantly outdated. Additionally, port **5985** is open. Considering that we are working on a CTF, this strongly suggests that we may find valid credentials to log in through this service.
 
-## Enumerating SMB as anonymous
+### Enumerating SMB as anonymous
 ---
 
 As always, we start by enumerating SMB to check for potential access as **anonymous** or **guest**. Unfortunately, we did not find anything interesting.
@@ -83,7 +83,7 @@ SMB         10.10.10.182    445    CASC-DC1         [*] Windows 7 / Server 2008 
 SMB         10.10.10.182    445    CASC-DC1         [-] cascade.local\guest:guest STATUS_LOGON_FAILURE 
 ````
 
-## Enumerating RPC
+### Enumerating RPC
 ---
 
 We also noticed that the RPC port is open, so we will attempt to enumerate it as well. As we observed in the previous machine we worked on, "Resolute," this service can reveal important information.
@@ -134,7 +134,7 @@ File: users.txt
   15   │ i.croft
 ````
 
-## Enumerating LDAP
+### Enumerating LDAP
 ---
 
 According to our methodology, the next step is to enumerate LDAP. To do this, we first need to obtain the naming contexts using the following command.
@@ -217,7 +217,7 @@ msDS-SupportedEncryptionTypes: 0
 cascadeLegacyPwd: clk0bjVldmE=
 ````
 
-# FOOTHOLD 
+## FOOTHOLD 
 ---
 
 ````bash
@@ -300,7 +300,7 @@ While searching online for methods to decrypt VNC passwords, we found a one-line
 00000000  73 54 33 33 33 76 65 32                           |sT333ve2|
 00000008
 ````
-## Connecting into WINRM as s.smith
+### Connecting into WINRM as s.smith
 ---
 
 Confirming that we are able to log in on winrm
@@ -328,7 +328,7 @@ Mode                LastWriteTime         Length Name
 -a----         2/4/2021   4:24 PM           1031 WinDirStat.lnk
 ````
 
-# PRIVILEGE ESCALATION
+## PRIVILEGE ESCALATION
 ---
 
 While enumerating the groups of the new user, I noticed that they belong to **Audit Share**, which we had previously enumerated with **crackmapexec**.
@@ -416,7 +416,7 @@ By examining the code, we can see that it encrypts the password (stored in the d
 
 ![Usersweb](/assets/cascade/cyberchef.png)
 
-## Log in on WinRM as arksvc
+### Log in on WinRM as arksvc
 ---
 Usaremos las credenciales encontradas para entrar al nuevo usuario y ver que clase de permisos tenemos
 
@@ -512,7 +512,7 @@ CN                              : TempAdmin
                                   DEL:f0cc344d-31e0-4866-bceb-a842791ca059
 ````
 
-# LOG IN AS ADMINISTRATOR 
+## LOG IN AS ADMINISTRATOR 
 ---
 
 We found the credentials encoded in **Base64**, so we simply decoded them and finally became **Administrator**.
