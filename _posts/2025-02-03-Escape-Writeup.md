@@ -1,7 +1,7 @@
 ---
 layaout: post
 image: /assets/images/escape.png
-title: Escpae Write Up HTB
+title: Escape Write Up HTB
 date: 03-02-2025
 categories: [Write ups]
 tag: [Active Directory, certify, mssql, man-in-the-middle]
