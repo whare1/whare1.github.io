@@ -41,6 +41,12 @@ smb: \> prompt OFF
 smb: \> recurse ON
 smb: \> mget *
 ````
+
+### Smbmap
+````bash
+smbmap -H 10.10.10.192 -u audit2020 -p 'wharep@ssword2025'
+````
+
 ## ENUMERATING RPC
 ---
 **RPC** is a protocol used by programs to request services or perform tasks on a remote server or computer. It allows a program to execute code on another machine as if it were local, facilitating distributed computing. It’s widely used for client-server communication and allows seamless interaction between systems over a network.
@@ -84,10 +90,9 @@ Netexec is a post-exploitation tool used to execute commands on remote machines 
 
 ````bash
 netexec ldap <target-ip> -u <user> -p <password> --module enumdc # Enumerate Domain Controllers
-netexec ldap <target-ip> -u <user> -p <password> --module enumusers # Search for users
+netexec ldap <target-ip> -u <user> -p <password> --module user-desc # Search for users
 netexec ldap <target-ip> -u <user> -p <password> --module adcs # Check for misconfigurations in ADCS
-netexec ldap <target-ip> -u <user> -p <password> --module ldapbind # Search for bindings
-netexec ldap <target-ip> -u <user> -p <password> --module enumgroups # Search for groups
+netexec ldap <target-ip> -u <user> -p <password> --module ldap-checker # Search for bindings
 ````
 
 ## ENUMERATING TLS
@@ -273,4 +278,16 @@ In short, **LAPS_Readers** allows members to **view** the local administrator pa
 Get-ADComputer -Filter * | Select-Object Name
 Get-ADComputer -Identity "DC01" -Properties ms-Mcs-AdmPwd
 ````
+
+#### Backup Operators
+---
+The Backup Operators group is a built-in group in Windows that grants its members the ability to back up and restore files on the system, even if they do not have direct access to those files. Members of this group have elevated privileges, but they are often overlooked when it comes to privilege escalation, as they can access sensitive files such as the NTDS.dit file, which contains the Active Directory database, including user credentials and hashes.
+
+Our goal is to leverage our membership in the Backup Operators group to try to copy the NTDS.dit file. Once we have a copy of the file, we can extract and crack the hashes stored inside it to potentially gain access to other user accounts or escalate our privileges further.
+
+Guide step by step <a href="https://whare1.github.io/posts/Blackfield-Writeup" target="_blank">here</a>
+
+
+
+
 ![netrunner](/assets/images/netrunner.gif)
