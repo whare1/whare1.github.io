@@ -1,13 +1,13 @@
 ---
 layaout: post
 title: Active Directory Tools & attacks
-image: /assets/images/active_dir.png
+image: /assets/images/ad4.png
 date: 14-01-2025
 categories: [Pentesting & Techniques]
 tag: [cheat sheet, tools, Active Directory]
 excerpt: "This document is a work-in-progress where I’m compiling a variety of techniques for enumerating and exploiting Active Directory environments. It will be updated over time with additional steps and insights as I continue to explore and refine the methodology."
 ---
-![img-description](/assets/images/active_dir.png)
+![img-description](/assets/images/ad4.png)
 
 This document is a work-in-progress where I’m compiling a variety of techniques for enumerating and exploiting Active Directory environments. It will be updated over time with additional steps and insights as I continue to explore and refine the methodology
 <p style="font-size:2em; font-weight:bold; margin-bottom: 0;">ENUMERATION TECHNICS</p>

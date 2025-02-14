@@ -1,13 +1,13 @@
 ---
 layout: post
 title: Web Hacking Vulnerabilities & Exploits
-image: /assets/images/test2.png
+image: /assets/images/vulnweb1.png
 date: 15-01-2025
 categories: [Pentesting & Techniques]
 tag: [cheat sheet, vulnerabilities, web security]
 excerpt: "This document is a work-in-progress where I’m compiling a variety of common web vulnerabilities and exploitation techniques. It will be updated over time with additional insights and methodologies as I continue refining my approach."
 ---
-![img-description](/assets/images/test2.png)
+![img-description](/assets/images/vulnweb1.png)
 
 This document is a work-in-progress where I’m compiling a variety of common web vulnerabilities and exploitation techniques. It will be updated over time with additional insights and methodologies as I continue refining my approach.
 <p style="font-size:2em; font-weight:bold; margin-bottom: 0;">COMMON VULNERABILITIES</p>
