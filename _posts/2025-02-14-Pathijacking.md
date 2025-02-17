@@ -207,3 +207,4 @@ We can try to find the module logging,subprocess or colorama and if we have writ
 ❯ ls -la /usr/lib/python3/dist-packages/pip/_internal/utils/logging.py
 .rwxrwxrwx root root 12 KB Sun Jan 26 17:41:40 2025  /usr/lib/python3/dist-packages/pip/_internal/utils/logging.py
 ````
+![netrunner](/assets/images/netrunner.gif)
