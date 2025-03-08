@@ -4,7 +4,7 @@ title: Path Hijacking
 image: /assets/images/path.png
 date: 14-02-2025
 categories: [Pentesting & Techniques]
-tag: [suid, sudoers, binarys, pathijacking]
+tag: [suid, sudoers, binaries, pathijacking]
 excerpt: "Path Hijacking is a technique where an attacker manipulates the $PATH environment variable to run malicious code by placing a malicious binary in a directory that is searched before the legitimate one. This can lead to executing unauthorized commands."
 ---
 
