@@ -222,3 +222,5 @@ This CTF showcased a chain of vulnerabilities leading to flag extraction:
 - **Secure APIs**: Protect sensitive endpoints like `/api/auth` with strict access controls.
 
 The use of a webhook to bypass CORS highlights a common technique in XSS exploitation. Developers must combine input validation, access controls, and secure CORS policies to prevent such attack chains.
+
+![netrunner](/assets/images/netrunner.gif)
