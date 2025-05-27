@@ -3,13 +3,11 @@ layaout: post
 title: Dashboarded HTB Bussines CTF 2025
 image: assets/images/aws.png
 date: 27-05-2025
-categories:
-  - Write ups
-tags:
-  - Cloud
+categories: [Write ups]
+tags: [Cloud, aws]
 excerpt: The goal is to infiltrate Volnaya's cloud-based Industrial Control System (ICS) monitoring network, locate sensitive data, and enable the Task Force to assume control of their core systems. The entry point is a web application hosted at `3.15.107.79`, which is vulnerable to Server-Side Request Forgery (SSRF). Ultimately, we aim to retrieve critical system information and capture the flag.
 ---
-![img-description](assets/images/dashboarded.png)
+![img-description](assets/images/dashb.png)
 ## Objective
 ---
 The goal is to infiltrate Volnaya's cloud-based Industrial Control System (ICS) monitoring network, locate sensitive data, and enable the Task Force to assume control of their core systems. The entry point is a web application hosted at `3.15.107.79`, which is vulnerable to Server-Side Request Forgery (SSRF). Ultimately, we aim to retrieve critical system information and capture the flag.
